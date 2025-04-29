@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import SearchBar from '../app/components/SearchBar';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Lottie from 'lottie-react';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import sunnyAnimation from '../public/animations/sunny.json';
 import rainyAnimation from '../public/animations/rainy.json';
 import cloudyAnimation from '../public/animations/normal.json';
@@ -35,6 +35,10 @@ const Home = () => {
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [backgroundClass, setBackgroundClass] = useState('bg-sunny');
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -100,7 +104,7 @@ const Home = () => {
       return winterAnimation;
     }
     if (condition.toLowerCase().includes('rain')) return rainyAnimation;
-    if (condition.toLowerCase().includes('cloud')) return cloudyAnimation;
+    if (condition.toLowerCase().includes('cloud')) return cloudyAnimation;  
     return sunnyAnimation;
   };
 
@@ -151,6 +155,7 @@ const Home = () => {
           <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-xl shadow-lg text-center animate-slideUp flex-grow">
             <h2 className="text-2xl font-semibold text-primary mb-4">{weather.city}</h2>
             <div className="w-32 h-32 mx-auto mb-4">
+            {mounted && (
               <Lottie
                 animationData={getWeatherAnimation(
                   weather.weather.current.description || 'clear',
@@ -158,6 +163,7 @@ const Home = () => {
                 )}
                 loop={true}
               />
+            )}
             </div>
             <div className="flex items-center justify-center mb-2">
               {getWeatherIcon(
