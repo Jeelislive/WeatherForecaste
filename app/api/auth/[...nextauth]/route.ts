@@ -1,10 +1,11 @@
+// app/api/auth/[...nextauth]/route.ts
+
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
-
 import { AuthOptions } from 'next-auth';
 
 export const authOptions: AuthOptions = {
@@ -28,20 +29,20 @@ export const authOptions: AuthOptions = {
 
         const user = await User.findOne({ email: credentials.email });
 
-        if (!user || !user.password) {
-          return null;
-        }
+        if (!user || !user.password) return null;
 
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
           user.password
         );
 
-        if (!isPasswordValid) {
-          return null;
-        }
+        if (!isPasswordValid) return null;
 
-        return { id: user._id.toString(), email: user.email, name: user.name };
+        return {
+          id: user._id.toString(),
+          email: user.email,
+          name: user.name,
+        };
       },
     }),
   ],
@@ -49,20 +50,19 @@ export const authOptions: AuthOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    async session({ session, token }: { session: any; token: any }) {
-      if (session.user) {
-        session.user.id = token.sub!;
+    async session({ session, token }) {
+      if (session.user && token.sub) {
+        session.user.id = token.sub;
       }
       return session;
     },
-    async jwt({ token, user }: { token: any; user?: { id: string } }) {
+    async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
       }
       return token;
     },
   },
-  // Removed the invalid 'database' property as it is not part of AuthOptions
 };
 
 const handler = NextAuth(authOptions);
