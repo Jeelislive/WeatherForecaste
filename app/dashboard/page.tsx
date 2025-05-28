@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { jsPDF } from 'jspdf';
 import dynamic from 'next/dynamic';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
-import { BellIcon, SunIcon, CloudIcon, MapPinIcon, ArrowPathIcon, DocumentArrowDownIcon, PlusIcon, ArrowRightOnRectangleIcon, ExclamationTriangleIcon, CheckCircleIcon, InformationCircleIcon, PaperAirplaneIcon, CloudArrowDownIcon, MagnifyingGlassIcon, XMarkIcon, SparklesIcon, GlobeAltIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { BellIcon, SunIcon, CloudIcon, MapPinIcon, ArrowPathIcon, DocumentArrowDownIcon, PlusIcon, ArrowRightOnRectangleIcon, ExclamationTriangleIcon, CheckCircleIcon, InformationCircleIcon, PaperAirplaneIcon, CloudArrowDownIcon, MagnifyingGlassIcon, XMarkIcon, SparklesIcon, GlobeAltIcon, ArrowLeftIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import debounce from 'lodash.debounce';
 import { fetchWeatherNews } from '../utils/fetchWeatherNews';
@@ -93,13 +93,13 @@ export default function Dashboard() {
   const [startSuggestions, setStartSuggestions] = useState<NominatimSuggestion[]>([]);
   const [endSuggestions, setEndSuggestions] = useState<NominatimSuggestion[]>([]);
   const [waypointSuggestions, setWaypointSuggestions] = useState<NominatimSuggestion[]>([]);
-  // Near Me states
-  const [nearMeSearchTerm, setNearMeSearchTerm] = useState('');
+  const [nearMeSearchTerm, setNearMeTerm] = useState('');
   const [nearMeUserLocation, setNearMeUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [nearMePlaces, setNearMePlaces] = useState<NearMePlace[]>([]);
   const [nearMeSelectedPlace, setNearMeSelectedPlace] = useState<NearMePlace | null>(null);
   const [nearMeLoading, setNearMeLoading] = useState(false);
   const [nearMeError, setNearMeError] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const startInputRef = useRef<HTMLInputElement>(null);
   const endInputRef = useRef<HTMLInputElement>(null);
@@ -227,6 +227,7 @@ export default function Dashboard() {
     setCityInput('');
     setWeatherData(null);
     setHourlyForecast([]);
+    setIsMobileMenuOpen(false);
     toast('Switched to General Weather view.', { icon: '🌍' });
   };
 
@@ -234,15 +235,17 @@ export default function Dashboard() {
     setView('traveller');
     setWeatherData(null);
     setHourlyForecast([]);
+    setIsMobileMenuOpen(false);
     toast('Switched to Traveller view.', { icon: '🚗' });
   };
 
   const handleNearMeView = () => {
     setView('nearMe');
-    setNearMeSearchTerm('');
+    setNearMeTerm('');
     setNearMePlaces([]);
     setNearMeSelectedPlace(null);
     setNearMeError(null);
+    setIsMobileMenuOpen(false);
     requestNearMeLocation();
     toast('Switched to Near Me view.', { icon: '📍' });
   };
@@ -305,7 +308,6 @@ export default function Dashboard() {
     }
   };
 
-  // Near Me functions
   const requestNearMeLocation = () => {
     setNearMeError(null);
     if (navigator.geolocation) {
@@ -381,7 +383,7 @@ export default function Dashboard() {
         yPosition = margin;
       }
     };
-    
+
     const addSectionTitle = (title: string) => {
       addPageIfNeeded();
       doc.setFontSize(16);
@@ -546,6 +548,7 @@ export default function Dashboard() {
   };
 
   const handleSignOut = () => {
+    setIsMobileMenuOpen(false);
     signOut({ callbackUrl: '/login' });
   };
 
@@ -572,9 +575,9 @@ export default function Dashboard() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <SparklesIcon className="h-8 w-8 text-sky-500" />
-              <span className="ml-3 text-xl font-semibold text-slate-700 dark:text-sky-200">TravelMate AI</span>
+              <span className="ml-2 text-lg sm:text-xl font-semibold text-slate-700 dark:text-sky-200">TravelMate AI</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-3">
               <button
                 onClick={() => {
                   router.push('/notifications');
@@ -585,55 +588,106 @@ export default function Dashboard() {
               >
                 <BellIcon className="w-6 h-6 text-slate-600 dark:text-slate-300" />
                 {weatherNews.length > 0 && (
-                  <span className="absolute top-0 right-0 block h-3 w-3 transform -translate-y-1/2 translate-x-1/2">
+                  <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 justify-center items-center text-[9px] text-white">
-                      {weatherNews.length > 9 ? '9+' : weatherNews.length}
-                    </span>
                   </span>
                 )}
               </button>
               <button
                 onClick={handleGeneralWeather}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${view === 'weather' ? 'bg-sky-100 dark:bg-sky-700 text-sky-600 dark:text-sky-100' : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'weather' ? 'bg-sky-100 dark:bg-sky-700 text-sky-600 dark:text-sky-100' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 title="General Weather View"
               >
                 <SunIcon className="h-5 w-5 inline mr-1" /> Weather
               </button>
               <button
                 onClick={handleTravellerView}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${view === 'traveller' ? 'bg-sky-100 dark:bg-sky-700 text-sky-600 dark:text-sky-100' : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'traveller' ? 'bg-sky-100 dark:bg-sky-700 text-sky-600 dark:text-sky-100' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 title="Traveller Journey Planner"
               >
                 <MapPinIcon className="h-5 w-5 inline mr-1" /> Planner
               </button>
               <button
                 onClick={handleNearMeView}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${view === 'nearMe' ? 'bg-sky-100 dark:bg-sky-700 text-sky-600 dark:text-sky-100' : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'nearMe' ? 'bg-sky-100 dark:bg-sky-700 text-sky-600 dark:text-sky-100' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 title="Find Places Near Me"
               >
                 <GlobeAltIcon className="h-5 w-5 inline mr-1" /> Near Me
               </button>
               <button
                 onClick={handleSignOut}
-                className="p-2 text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-blue-300 transition-colors"
+                className="p-2 text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
                 title="Sign Out"
               >
                 <ArrowRightOnRectangleIcon className="h-6 w-6" />
               </button>
             </div>
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md"
+                aria-label="Toggle Menu"
+              >
+                <Bars3Icon className="h-6 w-6" />
+              </button>
+            </div>
           </div>
         </div>
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex flex-col px-4 py-2 space-y-2">
+              <button
+                onClick={() => {
+                  router.push('/notifications');
+                  toast('Navigating to Weather Notifications.', { icon: '🔔' });
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex items-center px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md"
+              >
+                <BellIcon className="h-5 w-5 mr-2" /> Notifications
+                {weatherNews.length > 0 && (
+                  <span className="ml-2 inline-flex h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={handleGeneralWeather}
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${view === 'weather' ? 'bg-sky-100 dark:bg-sky-700 text-sky-600 dark:text-sky-100' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+              >
+                <SunIcon className="h-5 w-5 mr-2" /> Weather
+              </button>
+              <button
+                onClick={handleTravellerView}
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${view === 'traveller' ? 'bg-sky-100 dark:bg-sky-700 text-sky-600 dark:text-sky-100' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+              >
+                <MapPinIcon className="h-5 w-5 mr-2" /> Planner
+              </button>
+              <button
+                onClick={handleNearMeView}
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${view === 'nearMe' ? 'bg-sky-100 dark:bg-sky-700 text-sky-600 dark:text-sky-100' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+              >
+                <GlobeAltIcon className="h-5 w-5 mr-2" /> Near Me
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="flex items-center px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md"
+              >
+                <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" /> Sign Out
+              </button>
+            </div>
+          </div>
+        )}
       </nav>
 
-      <main className="pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+      <main className="pt-20 pb-12 px-4 sm:px-6 lg:px-8">
         {view === 'traveller' ? (
           <div className="max-w-3xl mx-auto">
-            <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-2xl mb-8">
-              <h2 className="text-3xl font-bold text-center text-slate-800 dark:text-sky-100 mb-2">Journey Planner</h2>
-              <p className="text-center text-slate-600 dark:text-slate-400 mb-8">Enter your travel details to get a personalized weather-aware itinerary.</p>
+            <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 lg:p-8 rounded-xl shadow-lg mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-800 dark:text-sky-100 mb-2">Journey Planner</h2>
+              <p className="text-center text-slate-600 dark:text-slate-400 mb-6 text-sm sm:text-base">Enter your travel details to get a personalized weather-aware itinerary.</p>
               <form onSubmit={handleGenerateReport} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="relative">
                     <label htmlFor="startPoint" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Start Point</label>
                     <div className="flex items-center space-x-2">
@@ -644,24 +698,24 @@ export default function Dashboard() {
                         value={startPoint}
                         onChange={(e) => handleInputChange(e.target.value, setStartPoint, setStartSuggestions)}
                         placeholder="E.g., Sargasan, Gandhinagar"
-                        className="flex-grow p-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:text-white transition-colors"
+                        className="flex-grow p-2 sm:p-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:text-white transition-colors text-sm sm:text-base"
                       />
                       <button
                         type="button"
                         onClick={handleNearMeLocation}
-                        className="p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md transition-all duration-150 ease-in-out flex items-center"
+                        className="p-2 sm:p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md transition-all duration-150 ease-in-out flex items-center"
                         title="Use Current Location"
                       >
-                        <MapPinIcon className="h-5 w-5" />
+                        <MapPinIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                       </button>
                     </div>
                     {startSuggestions.length > 0 && (
-                      <ul className="absolute z-10 w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-lg mt-1 max-h-60 overflow-auto">
+                      <ul className="absolute z-20 w-full max-w-[calc(100%-3rem)] sm:max-w-[calc(100%-4rem)] bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
                         {startSuggestions.map((suggestion, index) => (
                           <li
                             key={index}
                             onClick={() => handleSelectSuggestion(suggestion, setStartPoint, setStartSuggestions)}
-                            className="p-2 hover:bg-sky-100 dark:hover:bg-sky-600 cursor-pointer text-sm"
+                            className="p-2 hover:bg-sky-100 dark:hover:bg-sky-600 cursor-pointer text-sm sm:text-base animate-fade-in"
                           >
                             {suggestion.display_name}
                           </li>
@@ -678,15 +732,15 @@ export default function Dashboard() {
                       value={endPoint}
                       onChange={(e) => handleInputChange(e.target.value, setEndPoint, setEndSuggestions)}
                       placeholder="E.g., Sarangpur, Botad"
-                      className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:text-white transition-colors"
+                      className="w-full p-2 sm:p-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:text-white transition-colors text-sm sm:text-base"
                     />
                     {endSuggestions.length > 0 && (
-                      <ul className="absolute z-10 w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-lg mt-1 max-h-60 overflow-auto">
+                      <ul className="absolute z-20 w-full max-w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
                         {endSuggestions.map((suggestion, index) => (
                           <li
                             key={index}
                             onClick={() => handleSelectSuggestion(suggestion, setEndPoint, setEndSuggestions)}
-                            className="p-2 hover:bg-sky-100 dark:hover:bg-sky-600 cursor-pointer text-sm"
+                            className="p-2 hover:bg-sky-100 dark:hover:bg-sky-600 cursor-pointer text-sm sm:text-base animate-fade-in"
                           >
                             {suggestion.display_name}
                           </li>
@@ -706,24 +760,24 @@ export default function Dashboard() {
                       value={waypointInput}
                       onChange={(e) => handleInputChange(e.target.value, setWaypointInput, setWaypointSuggestions)}
                       placeholder="E.g., Ahmedabad"
-                      className="flex-grow p-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:text-white transition-colors"
+                      className="flex-grow p-2 sm:p-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:text-white transition-colors text-sm sm:text-base"
                     />
                     <button
                       type="button"
                       onClick={handleAddWaypoint}
-                      className="p-3 bg-sky-500 hover:bg-sky-600 text-white rounded-lg shadow-md transition-all duration-150 ease-in-out flex items-center"
+                      className="p-2 sm:p-3 bg-sky-500 hover:bg-sky-600 text-white rounded-lg shadow-md transition-all duration-150 ease-in-out flex items-center"
                       title="Add Waypoint"
                     >
-                      <PlusIcon className="h-5 w-5" />
+                      <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                     </button>
                   </div>
                   {waypointSuggestions.length > 0 && (
-                    <ul className="absolute z-10 w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-lg mt-1 max-h-60 overflow-auto">
+                    <ul className="absolute z-20 w-full max-w-[calc(100%-3rem)] sm:max-w-[calc(100%-4rem)] bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
                       {waypointSuggestions.map((suggestion, index) => (
                         <li
                           key={index}
                           onClick={() => handleSelectSuggestion(suggestion, setWaypointInput, setWaypointSuggestions)}
-                          className="p-2 hover:bg-sky-100 dark:hover:bg-sky-600 cursor-pointer text-sm"
+                          className="p-2 hover:bg-sky-100 dark:hover:bg-sky-600 cursor-pointer text-sm sm:text-base animate-fade-in"
                         >
                           {suggestion.display_name}
                         </li>
@@ -735,10 +789,10 @@ export default function Dashboard() {
                       <p className="text-xs text-slate-600 dark:text-slate-400">Added waypoints:</p>
                       <ul className="flex flex-wrap gap-2">
                         {waypoints.map((wp, index) => (
-                          <li key={index} className="flex items-center bg-sky-100 dark:bg-sky-700 text-sky-700 dark:text-sky-200 text-sm px-3 py-1 rounded-full shadow-sm">
+                          <li key={index} className="flex items-center bg-sky-100 dark:bg-sky-700 text-sky-700 dark:text-sky-200 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full shadow-sm">
                             {wp}
-                            <button type="button" onClick={() => handleRemoveWaypoint(index)} className="ml-2 text-sky-500 hover:text-sky-700 dark:text-sky-300 dark:hover:text-sky-100">
-                              <XMarkIcon className="h-4 w-4" />
+                            <button type="button" onClick={() => handleRemoveWaypoint(index)} className="ml-1 sm:ml-2 text-sky-500 hover:text-sky-700 dark:text-sky-300 dark:hover:text-sky-100">
+                              <XMarkIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                             </button>
                           </li>
                         ))}
@@ -755,25 +809,25 @@ export default function Dashboard() {
                     value={departureDate}
                     onChange={(e) => setDepartureDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:text-white transition-colors"
+                    className="w-full p-2 sm:p-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:text-white transition-colors text-sm sm:text-base"
                   />
                 </div>
 
-                {error && <p className="text-sm text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900 p-3 rounded-md flex items-center"><ExclamationTriangleIcon className="h-5 w-5 mr-2"/> {error}</p>}
+                {error && <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/50 p-2 sm:p-3 rounded-md flex items-center"><ExclamationTriangleIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2"/> {error}</p>}
 
                 <button
                   type="submit"
                   disabled={isLoading || isQueryLoading}
-                  className="w-full flex items-center justify-center p-4 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-150 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center p-3 sm:p-4 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-150 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base"
                 >
                   {isLoading || isQueryLoading ? (
                     <>
-                      <ArrowPathIcon className="h-5 w-5 animate-spin mr-2" />
+                      <ArrowPathIcon className="h-4 w-4 sm:h-5 sm:w-5 animate-spin mr-2" />
                       Generating Report...
                     </>
                   ) : (
                     <>
-                      <PaperAirplaneIcon className="h-5 w-5 mr-2 transform -rotate-45" />
+                      <PaperAirplaneIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2 transform -rotate-45" />
                       Generate Detailed Trip Plan
                     </>
                   )}
@@ -782,14 +836,14 @@ export default function Dashboard() {
             </div>
 
             {report && (
-              <div className="mt-10 p-6 sm:p-8 bg-white dark:bg-slate-800 rounded-xl shadow-2xl">
+              <div className="mt-8 p-4 sm:p-6 lg:p-8 bg-white dark:bg-slate-800 rounded-xl shadow-lg">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
                   <div className="mb-4 sm:mb-0">
-                    <h3 className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-sky-100 leading-tight">
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 dark:text-sky-100 leading-tight">
                       {report.tripTitle || "Your Trip Plan"}
                     </h3>
                     {(report.startPoint || report.endPoint || report.departureDate) && (
-                      <div className="mt-1 text-xs text-slate-500 dark:text-slate-400 space-x-2">
+                      <div className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400 space-x-2">
                         {report.startPoint && <span>From: <strong>{report.startPoint}</strong></span>}
                         {report.endPoint && <span>To: <strong>{report.endPoint}</strong></span>}
                         {report.departureDate && <span>On: <strong>{new Date(report.departureDate).toLocaleDateString()}</strong></span>}
@@ -798,42 +852,42 @@ export default function Dashboard() {
                   </div>
                   <button
                     onClick={handleDownloadPDF}
-                    className="w-full sm:w-auto px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out flex items-center justify-center space-x-2 text-sm font-medium"
+                    className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out flex items-center justify-center space-x-2 text-sm font-medium"
                     title="Download Report as PDF"
                   >
-                    <DocumentArrowDownIcon className="h-5 w-5" />
+                    <DocumentArrowDownIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span>Download PDF</span>
                   </button>
                 </div>
 
                 {report.overallSummary && (
-                  <div className="mb-8 p-4 bg-sky-50 dark:bg-slate-700/50 rounded-lg shadow">
-                    <h4 className="text-xl font-semibold text-sky-700 dark:text-sky-300 mb-2 flex items-center">
-                      <InformationCircleIcon className="h-6 w-6 mr-2"/>Trip Overview
+                  <div className="mb-6 sm:mb-8 p-3 sm:p-4 bg-sky-50 dark:bg-slate-700/50 rounded-lg shadow-sm">
+                    <h4 className="text-lg sm:text-xl font-semibold text-sky-700 dark:text-sky-300 mb-2 flex items-center">
+                      <InformationCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-2"/>Trip Overview
                     </h4>
-                    <p className="text-slate-700 dark:text-slate-300 whitespace-pre-line text-sm leading-relaxed">{report.overallSummary}</p>
+                    <p className="text-slate-700 dark:text-slate-300 whitespace-pre-line text-sm sm:text-base leading-relaxed">{report.overallSummary}</p>
                   </div>
                 )}
 
                 {report.days?.map((dayPlan, dayIndex) => (
-                  <div key={dayIndex} className="mb-8 last:mb-0">
-                    <h4 className="text-xl sm:text-2xl font-semibold text-sky-700 dark:text-sky-300 mb-4 pb-2 border-b border-sky-200 dark:border-sky-700">
+                  <div key={dayIndex} className="mb-6 sm:mb-8 last:mb-0">
+                    <h4 className="text-lg sm:text-xl lg:text-2xl font-semibold text-sky-700 dark:text-sky-300 mb-4 pb-2 border-b border-sky-200 dark:border-sky-700">
                       Day {dayPlan.day}: {dayPlan.title}
                     </h4>
                     <div className="space-y-4">
                       {dayPlan.activities?.map((activity, activityIndex) => (
-                        <div key={activityIndex} className="pl-4 border-l-4 border-sky-500 dark:border-sky-400 py-1">
-                          <p className="font-medium text-slate-800 dark:text-slate-100 text-md">
+                        <div key={activityIndex} className="pl-3 sm:pl-4 border-l-4 border-sky-500 dark:border-sky-400 py-1">
+                          <p className="font-medium text-slate-800 dark:text-slate-100 text-sm sm:text-md">
                             <span className="text-sky-600 dark:text-sky-300 font-semibold">{activity.timeRange}:</span> {activity.description}
                           </p>
                           {activity.details && (
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 ml-2 whitespace-pre-line leading-snug">{activity.details}</p>
+                            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 ml-2 whitespace-pre-line leading-snug">{activity.details}</p>
                           )}
                         </div>
                       ))}
                     </div>
                     {dayPlan.notes && (
-                      <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-100 dark:bg-slate-700 p-2 rounded-md">Note: {dayPlan.notes}</p>
+                      <p className="mt-3 text-xs sm:text-sm text-slate-500 dark:text-slate-400 italic bg-slate-100 dark:bg-slate-700 p-2 rounded-md">Note: {dayPlan.notes}</p>
                     )}
                   </div>
                 ))}
@@ -841,17 +895,17 @@ export default function Dashboard() {
                 {(report.nearbyAttractions && report.nearbyAttractions.length > 0) ||
                 (report.importantTimings && report.importantTimings.length > 0) ||
                 (report.travelTips && report.travelTips.length > 0) ? (
-                  <div className="mt-10 pt-6 border-t border-slate-200 dark:border-slate-700 space-y-8">
+                  <div className="mt-8 sm:mt-10 pt-6 border-t border-slate-200 dark:border-slate-700 space-y-6 sm:space-y-8">
                     {report.nearbyAttractions && report.nearbyAttractions.length > 0 && (
                       <div>
-                        <h4 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-3 flex items-center">
-                          <MapPinIcon className="h-6 w-6 mr-2"/>Nearby Attractions
+                        <h4 className="text-lg sm:text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-3 flex items-center">
+                          <MapPinIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-2"/>Nearby Attractions
                         </h4>
                         <div className="space-y-3">
                           {report.nearbyAttractions.map((attraction, index) => (
                             <div key={index} className="p-3 bg-emerald-50 dark:bg-slate-700/50 rounded-lg shadow-sm">
-                              <p className="font-semibold text-slate-800 dark:text-slate-100 text-md">{attraction.name}</p>
-                              <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line mt-1">{attraction.description}</p>
+                              <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-md">{attraction.name}</p>
+                              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line mt-1">{attraction.description}</p>
                               {attraction.locationContext && <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">Context: {attraction.locationContext}</p>}
                               {attraction.timings && <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">Timings: {attraction.timings}</p>}
                             </div>
@@ -862,15 +916,15 @@ export default function Dashboard() {
 
                     {report.importantTimings && report.importantTimings.length > 0 && (
                       <div>
-                        <h4 className="text-xl font-semibold text-amber-700 dark:text-amber-300 mb-3 flex items-center">
-                          <BellIcon className="h-6 w-6 mr-2"/>Important Timings
+                        <h4 className="text-lg sm:text-xl font-semibold text-amber-700 dark:text-amber-300 mb-3 flex items-center">
+                          <BellIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-2"/>Important Timings
                         </h4>
                         <div className="space-y-3">
                           {report.importantTimings.map((timing, index) => (
                             <div key={index} className="p-3 bg-amber-50 dark:bg-slate-700/50 rounded-lg shadow-sm">
-                              <p className="font-semibold text-slate-800 dark:text-slate-100 text-md">{timing.name}</p>
-                              {timing.description && <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line mt-1">{timing.description}</p>}
-                              {timing.timings && <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Details: {timing.timings}</p>}
+                              <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-md">{timing.name}</p>
+                              {timing.description && <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line mt-1">{timing.description}</p>}
+                              {timing.timings && <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">Details: {timing.timings}</p>}
                             </div>
                           ))}
                         </div>
@@ -879,14 +933,14 @@ export default function Dashboard() {
 
                     {report.travelTips && report.travelTips.length > 0 && (
                       <div>
-                        <h4 className="text-xl font-semibold text-indigo-700 dark:text-indigo-300 mb-3 flex items-center">
-                          <CheckCircleIcon className="h-6 w-6 mr-2"/>Travel Tips
+                        <h4 className="text-lg sm:text-xl font-semibold text-indigo-700 dark:text-indigo-300 mb-3 flex items-center">
+                          <CheckCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-2"/>Travel Tips
                         </h4>
                         <div className="space-y-3">
                           {report.travelTips.map((tip, index) => (
                             <div key={index} className="p-3 bg-indigo-50 dark:bg-slate-700/50 rounded-lg shadow-sm">
-                              <p className="font-semibold text-slate-800 dark:text-slate-100 text-md">{tip.category}:</p>
-                              <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line mt-1">{tip.advice}</p>
+                              <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-md">{tip.category}:</p>
+                              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line mt-1">{tip.advice}</p>
                             </div>
                           ))}
                         </div>
@@ -912,95 +966,95 @@ export default function Dashboard() {
           />
         ) : (
           <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-4xl font-extrabold text-slate-800 dark:text-slate-100 flex items-center">
-                <MapPinIcon className="w-10 h-10 mr-3 text-sky-600 dark:text-sky-400" />
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-800 dark:text-slate-100 flex items-center">
+                <MapPinIcon className="w-8 h-8 sm:w-10 sm:h-10 mr-2 sm:mr-3 text-sky-600 dark:text-sky-400" />
                 Find Places Near Me
               </h1>
               <button
                 onClick={handleTravellerView}
-                className="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out inline-flex items-center"
+                className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 sm:px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out inline-flex items-center text-sm sm:text-base"
               >
-                <ArrowLeftIcon className="w-5 h-5 mr-2" />
+                <ArrowLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 Back to Planner
               </button>
             </div>
 
             {!nearMeUserLocation && (
-              <div className="text-center mb-6 p-6 bg-white dark:bg-slate-800 rounded-lg shadow-md">
-                <p className="mb-4 text-slate-600 dark:text-slate-300">Please allow location access to find places near you.</p>
+              <div className="text-center mb-6 p-4 sm:p-6 bg-white dark:bg-slate-800 rounded-lg shadow-md">
+                <p className="mb-4 text-slate-600 dark:text-slate-300 text-sm sm:text-base">Please allow location access to find places near you.</p>
                 <button
                   onClick={requestNearMeLocation}
-                  className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out inline-flex items-center"
+                  className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out inline-flex items-center text-sm sm:text-base"
                 >
-                  <MapPinIcon className="w-5 w-5 mr-2" />
+                  <MapPinIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   Allow Location Access
                 </button>
               </div>
             )}
 
             {nearMeUserLocation && (
-              <p className="text-center mb-6 text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-center mb-6 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                 Your current location: Latitude: {nearMeUserLocation.lat.toFixed(4)}, Longitude: {nearMeUserLocation.lng.toFixed(4)}
               </p>
             )}
 
-            <div className="flex justify-center mb-8 sticky top-20 z-10">
-              <div className="relative w-full max-w-lg">
+            <div className="flex justify-center mb-6 sm:mb-8 sticky top-16 sm:top-20 z-10">
+              <div className="relative w-full max-w-md sm:max-w-lg">
                 <input
                   type="text"
                   value={nearMeSearchTerm}
-                  onChange={(e) => setNearMeSearchTerm(e.target.value)}
+                  onChange={(e) => setNearMeTerm(e.target.value)}
                   placeholder="E.g., cafe, park, restaurant..."
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 transition-colors"
+                  className="w-full pl-8 sm:pl-10 pr-4 py-2 sm:py-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 transition-colors text-sm sm:text-base"
                   disabled={!nearMeUserLocation}
                   onKeyPress={(e) => e.key === 'Enter' && handleNearMeSearch(e)}
                   ref={nearMeInputRef}
                 />
-                <MagnifyingGlassIcon className="w-5 h-5 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <MagnifyingGlassIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 dark:text-slate-500 absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2" />
               </div>
               <button
                 onClick={handleNearMeSearch}
                 disabled={nearMeLoading || !nearMeUserLocation}
-                className="ml-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 ease-in-out"
+                className="ml-2 sm:ml-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg shadow-md hover:shadow-lg disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 ease-in-out text-sm sm:text-base"
               >
                 {nearMeLoading ? 'Searching...' : 'Search'}
               </button>
             </div>
 
             {nearMeError && (
-              <p className="text-red-600 dark:text-red-400 text-center mb-6 p-3 bg-red-100 dark:bg-red-900/30 rounded-md">
-                <ExclamationTriangleIcon className="h-5 w-5 mr-2 inline" /> {nearMeError}
+              <p className="text-red-600 dark:text-red-400 text-center mb-6 p-2 sm:p-3 bg-red-100 dark:bg-red-900/30 rounded-md text-xs sm:text-sm">
+                <ExclamationTriangleIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2 inline" /> {nearMeError}
               </p>
             )}
 
-            {nearMeLoading && <p className="text-center text-slate-600 dark:text-slate-400">Loading places...</p>}
+            {nearMeLoading && <p className="text-center text-slate-600 dark:text-slate-400 text-sm sm:text-base">Loading places...</p>}
 
-            <div className="grid grid-cols-1 gap-8">
-              <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="space-y-4 sm:space-y-6 max-h-[calc(100vh-16rem)] sm:max-h-[70vh] overflow-y-auto pr-0 sm:pr-2">
                 {!nearMeLoading && nearMePlaces.length > 0 && nearMePlaces.map((place) => (
                   <div
                     key={place.id}
-                    className={`bg-white dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-600 p-5 shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out cursor-pointer ${nearMeSelectedPlace?.id === place.id ? 'ring-2 ring-sky-500' : ''}`}
+                    className={`bg-white dark:bg-gray-80 rounded-lg border border-slate-200 dark:border-gray-800 p-4 sm:p-5 lg:p-6 shadow-lg hover:shadow-xl transition-all duration-200 ease-in-out cursor-pointer animate-slide-up ${nearMeSelectedPlace?.id === place.id ? 'ring-2 ring-sky-500' : ''}`}
                     onClick={() => setNearMeSelectedPlace(place)}
                   >
-                    <div className="flex items-center mb-2">
-                      {place.icon && <img src={place.icon} alt={place.name} className="w-5 h-5 mr-2 rounded-full" />}
-                      <h2 className="text-xl font-semibold text-sky-700 dark:text-sky-400">{place.name}</h2>
+                    <div className="flex items-center space-x-2 mb-3 sm:mb-4">
+                      {place.icon && <img src={place.icon} alt={place.name} className="w-4 h-4 sm:w-5 sm:h-5 mr-2 rounded-full" />}
+                      <h4 className="text-base sm:text-lg lg:text-xl font-semibold text-sky-700 dark:text-sky-400">{place.name}</h4>
                     </div>
-                    {place.address && <p className="text-slate-600 dark:text-slate-300 mb-1 text-sm">{place.address}</p>}
-                    {place.distance && <p className="text-sm text-slate-500 dark:text-slate-400 mb-2"><strong>Distance:</strong> {place.distance}</p>}
+                    {place.address && <p className="text-slate-600 dark:text-gray-300 mb-2 text-xs sm:text-sm">{place.address}</p>}
+                    {place.distance && <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 mb-2"><strong>Distance:</strong> {place.distance}</p>}
 
                     {place.images && place.images.length > 0 && (
-                      <div className="mt-3">
-                        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Images:</h4>
-                        <div className="grid grid-cols-3 gap-2">
+                      <div className="mt-3 sm:mt-4">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-gray-300 mb-1">Images:</h4>
+                        <div className="grid-cols-2 sm:grid-cols-3 grid gap-2">
                           {place.images.slice(0, 3).map((imgUrl, index) => (
                             <img
                               key={index}
                               src={imgUrl}
                               alt={`${place.name} image ${index + 1}`}
-                              className="w-full h-20 object-cover rounded-md shadow-sm"
+                              className="w-full h-16 sm:h-20 lg:h-24 object-cover rounded-md shadow-sm"
                               onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/150?text=No+Image')}
                             />
                           ))}
@@ -1009,19 +1063,19 @@ export default function Dashboard() {
                     )}
 
                     {place.reviews && place.reviews.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Reviews:</h4>
-                        <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400 max-h-20 overflow-y-auto">
+                      <div className="mt-3 sm:mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-gray-300 mb-1">Reviews:</h4>
+                        <ul className="space-y-600 dark:text-gray-400 max-h-16 sm:max-h-20 overflow-y-auto">
                           {place.reviews.slice(0, 2).map((review, index) => (
-                            <li key={index} className="p-1 bg-gray-50 dark:bg-slate-700/50 rounded-sm">"{review}"</li>
-                          ))}
-                        </ul>
-                      </div>
+                            <li key={index} className="text-sm p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-700/50 rounded-sm">"{review}"</li>
+                            ))}
+                          </ul>
+                        </div>
                     )}
 
                     {(place.type || place.class) && (
-                      <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                        <span className="text-xs bg-sky-100 dark:bg-sky-800 text-sky-700 dark:text-sky-300 px-2 py-1 rounded-full capitalize">
+                      <div className="mt-3 sm:mt-4 pt-2 sm:pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <span className="text-xs sm:text-sm bg-sky-100 dark:bg-sky-800 text-sky-700 dark:text-sky-300 px-2 sm:px-2 py-1 rounded-full capitalize">
                           {place.type}{place.type && place.class ? ` (${place.class})` : place.class || ''}
                         </span>
                       </div>
@@ -1029,14 +1083,14 @@ export default function Dashboard() {
                   </div>
                 ))}
                 {!nearMeLoading && nearMePlaces.length === 0 && nearMeSearchTerm && nearMeUserLocation && !nearMeError && (
-                  <p className="text-center text-slate-600 dark:text-slate-400 mt-8 p-4 bg-white dark:bg-slate-800 rounded-lg shadow-md">
-                    No places found for "{nearMeSearchTerm}". Try a different search term or check for typos.
-                  </p>
+                  <div className="text-center mt-4 sm:mt-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">No places found for "{nearMeSearchTerm}". Please try a different search term or check for typos.</p>
+                  </div>
                 )}
               </div>
             </div>
           </div>
-        )}
+      )}
       </main>
       <Chatbot weatherData={weatherData} report={report || undefined} cityInput={cityInput} />
     </div>
