@@ -60,20 +60,59 @@ const NearMePage = () => {
     }
   };
 
-  const requestLocation = () => {
+  const requestLocation = async () => {
     setError(null);
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-        },
-        (err) => {
-          setError(`Error getting location: ${err.message}`);
+      // Helper functions for success and error to avoid repetition
+      const handlePosition = (position: GeolocationPosition) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      };
+
+      const handleError = (err: GeolocationPositionError) => {
+        if (err.code === 1) { // GeolocationPositionError.PERMISSION_DENIED
+          setError('Location access denied. To use this feature, please enable location permissions in your browser/OS settings.');
+        } else {
+          setError(`Error getting location: ${err.message}. Please ensure location services are enabled on your device.`);
         }
-      );
+      };
+
+      if (navigator.permissions && navigator.permissions.query) {
+        try {
+          const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
+
+          permissionStatus.onchange = () => {
+            console.log(`Geolocation permission state changed to: ${permissionStatus.state}`);
+            if (permissionStatus.state === 'granted') {
+              if (!userLocation) {
+                navigator.geolocation.getCurrentPosition(handlePosition, handleError);
+              }
+            } else if (permissionStatus.state === 'denied') {
+              setError('Location access has been denied or revoked. Please enable location permissions for this site in your browser/OS settings to use this feature.');
+              setUserLocation(null);
+            } else if (permissionStatus.state === 'prompt') {
+                setError('Location permission status changed. Please click "Allow Location Access" again if needed.');
+            }
+          };
+
+          if (permissionStatus.state === 'granted') {
+            navigator.geolocation.getCurrentPosition(handlePosition, handleError);
+          } else if (permissionStatus.state === 'prompt') {
+            navigator.geolocation.getCurrentPosition(handlePosition, handleError);
+          } else if (permissionStatus.state === 'denied') {
+            setError('Location access has been denied. Please enable location permissions for this site in your browser/OS settings to use this feature.');
+          }
+        } catch (e) {
+          console.error("Error querying location permissions: ", e);
+          setError('Could not determine location permission status. Attempting to get location directly.');
+          navigator.geolocation.getCurrentPosition(handlePosition, handleError);
+        }
+      } else {
+        console.warn("Permissions API not supported. Using basic geolocation.");
+        navigator.geolocation.getCurrentPosition(handlePosition, handleError);
+      }
     } else {
       setError('Geolocation is not supported by this browser.');
     }

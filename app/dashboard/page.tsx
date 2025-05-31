@@ -320,8 +320,16 @@ export default function Dashboard() {
           toast.success('Location acquired!', { id: 'near-me-location' });
         },
         (err) => {
-          setNearMeError(`Error getting location: ${err.message}`);
-          toast.error(`Error getting location: ${err.message}`, { id: 'near-me-location' });
+          let errorMessage = `Error getting location: ${err.message}`;
+          if (err.code === 1) { // PERMISSION_DENIED
+            errorMessage = "Location access denied. Please enable it in your browser/OS settings and try again.";
+          } else if (err.code === 2) {
+            errorMessage = "Location information is unavailable. Please check your network or try again later.";
+          } else if (err.code === 3) {
+            errorMessage = "Getting location timed out. Please try again.";
+          }
+          setNearMeError(errorMessage);
+          toast.error(errorMessage, { id: 'near-me-location', duration: 5000 });
         }
       );
     } else {
@@ -642,12 +650,14 @@ export default function Dashboard() {
                   toast('Navigating to Weather Notifications.', { icon: '🔔' });
                   setIsMobileMenuOpen(false);
                 }}
-                className="flex items-center px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md"
+                className="relative flex items-center px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md w-full text-left"
               >
-                <BellIcon className="h-5 w-5 mr-2" /> Notifications
+                <BellIcon className="h-5 w-5 mr-2" />
+                <span>Notifications</span>
                 {weatherNews.length > 0 && (
-                  <span className="ml-2 inline-flex h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                  <span className="absolute top-1/2 right-3 transform -translate-y-1/2 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 ring-1 ring-white dark:ring-slate-800"></span>
                   </span>
                 )}
               </button>

@@ -111,9 +111,9 @@ export default function WeatherNotifications() {
               {highAlertNews.map((news) => (
                 <div
                   key={news.id}
-                  className="p-6 bg-red-50 rounded-lg border border-red-200 shadow-md"
+                  className="p-6 bg-red-100 rounded-lg border border-red-400 shadow-md"
                 >
-                  <h3 className="text-lg font-medium text-red-800 mb-2">{news.title}</h3>
+                  <h3 className="text-lg font-medium text-red-700 mb-2">{news.title}</h3>
                   {news.imageUrl && (
                     <img
                       src={news.imageUrl}
