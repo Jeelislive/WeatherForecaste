@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { jsPDF } from 'jspdf';
 import dynamic from 'next/dynamic';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
-import { BellIcon, SunIcon, CloudIcon, MapPinIcon, ArrowPathIcon, DocumentArrowDownIcon, PlusIcon, ArrowRightOnRectangleIcon, ExclamationTriangleIcon, CheckCircleIcon, InformationCircleIcon, PaperAirplaneIcon, CloudArrowDownIcon, MagnifyingGlassIcon, XMarkIcon, SparklesIcon, GlobeAltIcon, ArrowLeftIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { BellIcon, SunIcon, CloudIcon, MapPinIcon, ArrowPathIcon, DocumentArrowDownIcon, PlusIcon, ArrowRightOnRectangleIcon, ExclamationTriangleIcon, CheckCircleIcon, InformationCircleIcon, PaperAirplaneIcon, CloudArrowDownIcon, MagnifyingGlassIcon, XMarkIcon, SparklesIcon, GlobeAltIcon, ArrowLeftIcon, Bars3Icon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import debounce from 'lodash.debounce';
 import { fetchWeatherNews } from '../utils/fetchWeatherNews';
@@ -846,7 +846,7 @@ export default function Dashboard() {
             </div>
 
             {report && (
-              <div className="mt-8 p-4 sm:p-6 lg:p-8 bg-white dark:bg-slate-800 rounded-xl shadow-lg">
+              <div className="mt-8 p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/80 dark:to-slate-900/70 rounded-xl shadow-xl">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
                   <div className="mb-4 sm:mb-0">
                     <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 dark:text-sky-100 leading-tight">
@@ -871,7 +871,7 @@ export default function Dashboard() {
                 </div>
 
                 {report.overallSummary && (
-                  <div className="mb-6 sm:mb-8 p-3 sm:p-4 bg-sky-50 dark:bg-slate-700/50 rounded-lg shadow-sm">
+                  <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-white dark:bg-slate-700 rounded-lg shadow-lg">
                     <h4 className="text-lg sm:text-xl font-semibold text-sky-700 dark:text-sky-300 mb-2 flex items-center">
                       <InformationCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-2"/>Trip Overview
                     </h4>
@@ -880,24 +880,25 @@ export default function Dashboard() {
                 )}
 
                 {report.days?.map((dayPlan, dayIndex) => (
-                  <div key={dayIndex} className="mb-6 sm:mb-8 last:mb-0">
-                    <h4 className="text-lg sm:text-xl lg:text-2xl font-semibold text-sky-700 dark:text-sky-300 mb-4 pb-2 border-b border-sky-200 dark:border-sky-700">
+                  <div key={dayIndex} className="mb-6 sm:mb-8 last:mb-0 bg-white dark:bg-slate-700 p-4 sm:p-6 rounded-lg shadow-lg">
+                    <h4 className="text-xl sm:text-2xl font-bold text-sky-600 dark:text-sky-300 mb-4 pb-3 border-b border-slate-200 dark:border-slate-600">
                       Day {dayPlan.day}: {dayPlan.title}
                     </h4>
                     <div className="space-y-4">
                       {dayPlan.activities?.map((activity, activityIndex) => (
-                        <div key={activityIndex} className="pl-3 sm:pl-4 border-l-4 border-sky-500 dark:border-sky-400 py-1">
+                        <div key={activityIndex} className="relative pl-6 pr-2 py-3 bg-slate-50 dark:bg-slate-700/50 rounded-md shadow-sm my-3">
+                          <div className="absolute left-2.5 top-4 w-2.5 h-2.5 bg-sky-500 rounded-full border-2 border-white dark:border-slate-700/50"></div>
                           <p className="font-medium text-slate-800 dark:text-slate-100 text-sm sm:text-md">
                             <span className="text-sky-600 dark:text-sky-300 font-semibold">{activity.timeRange}:</span> {activity.description}
                           </p>
                           {activity.details && (
-                            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 ml-2 whitespace-pre-line leading-snug">{activity.details}</p>
+                            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 ml-0 whitespace-pre-line leading-snug">{activity.details}</p>
                           )}
                         </div>
                       ))}
                     </div>
                     {dayPlan.notes && (
-                      <p className="mt-3 text-xs sm:text-sm text-slate-500 dark:text-slate-400 italic bg-slate-100 dark:bg-slate-700 p-2 rounded-md">Note: {dayPlan.notes}</p>
+                      <p className="mt-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-600/50 p-3 rounded-md shadow-inner">Note: {dayPlan.notes}</p>
                     )}
                   </div>
                 ))}
@@ -905,7 +906,7 @@ export default function Dashboard() {
                 {(report.nearbyAttractions && report.nearbyAttractions.length > 0) ||
                 (report.importantTimings && report.importantTimings.length > 0) ||
                 (report.travelTips && report.travelTips.length > 0) ? (
-                  <div className="mt-8 sm:mt-10 pt-6 border-t border-slate-200 dark:border-slate-700 space-y-6 sm:space-y-8">
+                  <div className="mt-8 sm:mt-10 pt-6 border-t border-slate-300 dark:border-slate-600 space-y-6 sm:space-y-8">
                     {report.nearbyAttractions && report.nearbyAttractions.length > 0 && (
                       <div>
                         <h4 className="text-lg sm:text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-3 flex items-center">
@@ -913,7 +914,7 @@ export default function Dashboard() {
                         </h4>
                         <div className="space-y-3">
                           {report.nearbyAttractions.map((attraction, index) => (
-                            <div key={index} className="p-3 bg-emerald-50 dark:bg-slate-700/50 rounded-lg shadow-sm">
+                            <div key={index} className="p-4 bg-white dark:bg-slate-700 rounded-lg shadow-lg">
                               <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-md">{attraction.name}</p>
                               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line mt-1">{attraction.description}</p>
                               {attraction.locationContext && <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">Context: {attraction.locationContext}</p>}
@@ -931,7 +932,7 @@ export default function Dashboard() {
                         </h4>
                         <div className="space-y-3">
                           {report.importantTimings.map((timing, index) => (
-                            <div key={index} className="p-3 bg-amber-50 dark:bg-slate-700/50 rounded-lg shadow-sm">
+                            <div key={index} className="p-4 bg-white dark:bg-slate-700 rounded-lg shadow-lg">
                               <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-md">{timing.name}</p>
                               {timing.description && <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line mt-1">{timing.description}</p>}
                               {timing.timings && <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">Details: {timing.timings}</p>}
@@ -948,7 +949,7 @@ export default function Dashboard() {
                         </h4>
                         <div className="space-y-3">
                           {report.travelTips.map((tip, index) => (
-                            <div key={index} className="p-3 bg-indigo-50 dark:bg-slate-700/50 rounded-lg shadow-sm">
+                            <div key={index} className="p-4 bg-white dark:bg-slate-700 rounded-lg shadow-lg">
                               <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-md">{tip.category}:</p>
                               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line mt-1">{tip.advice}</p>
                             </div>
@@ -974,8 +975,8 @@ export default function Dashboard() {
             error={error}
             setError={setError}
           />
-        ) : (
-          <div className="max-w-4xl mx-auto">
+        ) : ( // view === 'nearMe'
+          <div className="max-w-6xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-800 dark:text-slate-100 flex items-center">
                 <MapPinIcon className="w-8 h-8 sm:w-10 sm:h-10 mr-2 sm:mr-3 text-sky-600 dark:text-sky-400" />
@@ -1040,24 +1041,25 @@ export default function Dashboard() {
 
             {nearMeLoading && <p className="text-center text-slate-600 dark:text-slate-400 text-sm sm:text-base">Loading places...</p>}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-              <div className="space-y-4 sm:space-y-6 max-h-[calc(100vh-16rem)] sm:max-h-[70vh] overflow-y-auto pr-0 sm:pr-2">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+              {/* Column 1: Places List */}
+              <div className="lg:col-span-1 space-y-4 sm:space-y-6 max-h-[calc(100vh-16rem)] sm:max-h-[70vh] overflow-y-auto pr-0 sm:pr-2">
                 {!nearMeLoading && nearMePlaces.length > 0 && nearMePlaces.map((place) => (
                   <div
                     key={place.id}
-                    className={`bg-white dark:bg-gray-80 rounded-lg border border-slate-200 dark:border-gray-800 p-4 sm:p-5 lg:p-6 shadow-lg hover:shadow-xl transition-all duration-200 ease-in-out cursor-pointer animate-slide-up ${nearMeSelectedPlace?.id === place.id ? 'ring-2 ring-sky-500' : ''}`}
+                    className={`bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/70 rounded-lg border border-slate-200 dark:border-slate-700 p-4 sm:p-5 lg:p-6 shadow-lg hover:shadow-xl transition-all duration-200 ease-in-out cursor-pointer animate-slide-up ${nearMeSelectedPlace?.id === place.id ? 'ring-2 ring-sky-500' : ''}`}
                     onClick={() => setNearMeSelectedPlace(place)}
                   >
                     <div className="flex items-center space-x-2 mb-3 sm:mb-4">
                       {place.icon && <img src={place.icon} alt={place.name} className="w-4 h-4 sm:w-5 sm:h-5 mr-2 rounded-full" />}
-                      <h4 className="text-base sm:text-lg lg:text-xl font-semibold text-sky-700 dark:text-sky-400">{place.name}</h4>
+                      <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-sky-600 dark:text-sky-400">{place.name}</h4>
                     </div>
-                    {place.address && <p className="text-slate-600 dark:text-gray-300 mb-2 text-xs sm:text-sm">{place.address}</p>}
-                    {place.distance && <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 mb-2"><strong>Distance:</strong> {place.distance}</p>}
+                    {place.address && <p className="text-slate-600 dark:text-slate-300 mb-2 text-xs sm:text-sm">{place.address}</p>}
+                    {place.distance && <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-2"><strong>Distance:</strong> {place.distance}</p>}
 
                     {place.images && place.images.length > 0 && (
-                      <div className="mt-3 sm:mt-4">
-                        <h4 className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-gray-300 mb-1">Images:</h4>
+                      <div className="mt-4 sm:mt-5">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Images:</h4>
                         <div className="grid-cols-2 sm:grid-cols-3 grid gap-2">
                           {place.images.slice(0, 3).map((imgUrl, index) => (
                             <img
@@ -1073,18 +1075,18 @@ export default function Dashboard() {
                     )}
 
                     {place.reviews && place.reviews.length > 0 && (
-                      <div className="mt-3 sm:mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-                        <h4 className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-gray-300 mb-1">Reviews:</h4>
-                        <ul className="space-y-600 dark:text-gray-400 max-h-16 sm:max-h-20 overflow-y-auto">
+                      <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Reviews:</h4>
+                        <ul className="space-y-1 text-slate-600 dark:text-slate-400 max-h-16 sm:max-h-20 overflow-y-auto">
                           {place.reviews.slice(0, 2).map((review, index) => (
-                            <li key={index} className="text-sm p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-700/50 rounded-sm">"{review}"</li>
-                            ))}
-                          </ul>
-                        </div>
+                            <li key={index} className="text-xs sm:text-sm p-1.5 sm:p-2 bg-slate-50 dark:bg-slate-700/60 rounded-md">"{review}"</li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
 
                     {(place.type || place.class) && (
-                      <div className="mt-3 sm:mt-4 pt-2 sm:pt-3 border-t border-gray-200 dark:border-gray-700">
+                      <div className="mt-3 sm:mt-4 pt-2 sm:pt-3 border-t border-slate-200 dark:border-slate-700">
                         <span className="text-xs sm:text-sm bg-sky-100 dark:bg-sky-800 text-sky-700 dark:text-sky-300 px-2 sm:px-2 py-1 rounded-full capitalize">
                           {place.type}{place.type && place.class ? ` (${place.class})` : place.class || ''}
                         </span>
@@ -1098,9 +1100,17 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
+
+              {/* Column 2: Work in Progress Placeholder */}
+              <div className="lg:col-span-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg shadow-inner p-6 flex flex-col items-center justify-center min-h-[300px] lg:min-h-[calc(70vh-theme(space.16))] sticky top-36 self-start">
+                <BuildingOfficeIcon className="h-16 w-16 text-slate-400 dark:text-slate-500 mb-4" />
+                <h3 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Map & Place Details</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 text-center">This feature is currently under construction.</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 text-center">(Coming Soon!)</p>
+              </div>
             </div>
           </div>
-      )}
+        )}
       </main>
       <Chatbot weatherData={weatherData} report={report || undefined} cityInput={cityInput} />
     </div>

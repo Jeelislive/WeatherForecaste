@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MapPinIcon, MagnifyingGlassIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+
 interface Place {
   id: string;
   name: string;
@@ -63,7 +64,6 @@ const NearMePage = () => {
   const requestLocation = async () => {
     setError(null);
     if (navigator.geolocation) {
-      // Helper functions for success and error to avoid repetition
       const handlePosition = (position: GeolocationPosition) => {
         setUserLocation({
           lat: position.coords.latitude,
@@ -72,7 +72,7 @@ const NearMePage = () => {
       };
 
       const handleError = (err: GeolocationPositionError) => {
-        if (err.code === 1) { // GeolocationPositionError.PERMISSION_DENIED
+        if (err.code === 1) {
           setError('Location access denied. To use this feature, please enable location permissions in your browser/OS settings.');
         } else {
           setError(`Error getting location: ${err.message}. Please ensure location services are enabled on your device.`);
@@ -82,7 +82,6 @@ const NearMePage = () => {
       if (navigator.permissions && navigator.permissions.query) {
         try {
           const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
-
           permissionStatus.onchange = () => {
             console.log(`Geolocation permission state changed to: ${permissionStatus.state}`);
             if (permissionStatus.state === 'granted') {
@@ -93,7 +92,7 @@ const NearMePage = () => {
               setError('Location access has been denied or revoked. Please enable location permissions for this site in your browser/OS settings to use this feature.');
               setUserLocation(null);
             } else if (permissionStatus.state === 'prompt') {
-                setError('Location permission status changed. Please click "Allow Location Access" again if needed.');
+              setError('Location permission status changed. Please click "Allow Location Access" again if needed.');
             }
           };
 
@@ -118,29 +117,29 @@ const NearMePage = () => {
     }
   };
 
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-slate-50 to-slate-100 dark:from-slate-800 dark:via-slate-900 dark:to-black text-slate-800 dark:text-slate-200 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-extrabold text-slate-800 dark:text-slate-100 flex items-center">
-            <MapPinIcon className="w-10 h-10 mr-3 text-sky-600 dark:text-sky-500" />
-            Find Places Near Me
+    <div className="min-h-screen bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 dark:from-slate-800 dark:via-slate-900 dark:to-black text-slate-800 dark:text-slate-200 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+          <h1 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 flex items-center">
+            <MapPinIcon className="w-10 h-10 mr-3 text-sky-600 dark:text-sky-400" />
+            Find Places Near Meee
+            <span className="ml-2 text-xs bg-yellow-400 text-yellow-800 px-2 py-1 rounded-full animate-pulse">
+              Feature in Improvement
+            </span>
           </h1>
-          <Link href="/dashboard" legacyBehavior>
-            <a className="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out inline-flex items-center">
-              <ArrowLeftIcon className="w-5 h-5 mr-2" />
-              Back to Home
-            </a>
+          <Link href="/dashboard" className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center">
+            <ArrowLeftIcon className="w-5 h-5 mr-2" />
+            Back to Home
           </Link>
         </div>
 
         {!userLocation && (
-          <div className="text-center mb-6 p-6 bg-white dark:bg-slate-800/50 rounded-lg shadow-md">
-            <p className="mb-4 text-slate-600 dark:text-slate-300">Please allow location access to find places near you.</p>
+          <div className="text-center mb-8 p-6 bg-slate-100 dark:bg-slate-900/90 rounded-xl shadow-lg backdrop-blur-sm border border-slate-200 dark:border-slate-700">
+            <p className="mb-4 text-slate-600 dark:text-slate-300 text-lg">Please allow location access to find places near you.</p>
             <button
               onClick={requestLocation}
-              className="bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out inline-flex items-center"
+              className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center mx-auto"
             >
               <MapPinIcon className="w-5 h-5 mr-2" />
               Allow Location Access
@@ -154,14 +153,14 @@ const NearMePage = () => {
           </p>
         )}
 
-        <div className="flex justify-center mb-8 sticky top-4 z-10">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10 sticky top-4 z-10">
           <div className="relative w-full max-w-lg">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="E.g., cafe, park, library..."
-              className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition-colors"
+              className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition-colors duration-200"
               disabled={!userLocation}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
@@ -170,67 +169,60 @@ const NearMePage = () => {
           <button
             onClick={handleSearch}
             disabled={!userLocation || loading}
-            className="ml-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-all duration-150 ease-in-out"
+            className="w-full sm:w-auto bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-all duration-200"
           >
             {loading ? 'Searching...' : 'Search'}
           </button>
         </div>
 
-        {error && <p className="text-red-500 dark:text-red-400 text-center mb-6 p-3 bg-red-100 dark:bg-red-900/30 rounded-md">{error}</p>}
+        {error && (
+          <p className="text-red-500 dark:text-red-400 text-center mb-6 p-4 bg-red-100 dark:bg-red-900/30 rounded-lg shadow-md">
+            {error}
+          </p>
+        )}
 
-        {loading && <p className="text-center text-slate-500 dark:text-slate-400">Loading places...</p>}
+        {loading && <p className="text-center text-slate-500 dark:text-slate-400 animate-pulse">Loading places...</p>}
 
-        <div className="grid grid-cols-1 gap-8">
-          <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
-            {!loading && places.length > 0 && places.map((place) => (
-              <div
-                key={place.id}
-                className={`bg-white dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer ${selectedPlace?.id === place.id ? 'ring-2 ring-sky-500' : ''}`}
-                onClick={() => setSelectedPlace(place)}
-              >
-                <div className="flex items-center mb-2">
-                  {place.icon && <img src={place.icon} alt={place.name} className="w-5 h-5 mr-2 rounded" />}
-                  <h2 className="text-xl font-semibold text-sky-700 dark:text-sky-400">{place.name}</h2>
-                </div>
-                {place.address && <p className="text-slate-600 dark:text-slate-300 mb-1 text-sm">{place.address}</p>}
-                {place.distance && <p className="text-sm text-slate-500 dark:text-slate-400 mb-2"><strong>Distance:</strong> {place.distance}</p>}
-
-                {place.images && place.images.length > 0 && (
-                  <div className="mt-3">
-                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Images:</h3>
-                    <div className="grid grid-cols-3 gap-2">
-                      {place.images.slice(0, 3).map((imgUrl, index) => (
-                        <img key={index} src={imgUrl} alt={`${place.name} image ${index + 1}`} className="w-full h-20 object-cover rounded-md shadow-sm" />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {place.reviews && place.reviews.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Reviews:</h3>
-                    <ul className="space-y-1 text-xs text-slate-500 dark:text-slate-400 max-h-20 overflow-y-auto">
-                      {place.reviews.slice(0, 2).map((review, index) => (
-                        <li key={index} className="p-1 bg-slate-50 dark:bg-slate-700/50 rounded-sm">"{review}"</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {(place.type || place.class) && (
-                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                    <span className="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full capitalize">
-                      {place.type}{place.type && place.class ? ` (${place.class})` : place.class || ''}
-                    </span>
-                  </div>
-                )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {!loading && places.length > 0 && places.map((place, index) => (
+            <div
+              key={place.id}
+              className={`bg-slate-100 dark:bg-slate-900/90 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out cursor-pointer transform hover:-translate-y-1 animate-fade-in ${selectedPlace?.id === place.id ? 'ring-2 ring-sky-500 dark:ring-sky-400' : ''}`}
+              style={{ animationDelay: `${index * 100}ms` }}
+              onClick={() => setSelectedPlace(place)}
+            >
+              <div className="flex items-center mb-2">
+                {place.icon && <img src={place.icon} alt={place.name} className="w-8 h-8 mr-3 rounded-full border border-slate-300 dark:border-slate-600" />}
+                <h2 className="text-xl font-bold text-sky-700 dark:text-sky-400">{place.name}</h2>
               </div>
-            ))}
-            {!loading && places.length === 0 && searchTerm && userLocation && !error && (
-              <p className="text-center text-slate-500 dark:text-slate-400 mt-8 p-4 bg-white dark:bg-slate-800/50 rounded-lg shadow">No places found for "{searchTerm}". Try a different search term or check for typos.</p>
-            )}
-          </div>
+              {place.address && <p className="text-slate-600 dark:text-slate-300 text-sm mb-2">{place.address}</p>}
+              {place.distance && <p className="text-sm text-slate-500 dark:text-slate-400 mb-3"><strong>Distance:</strong> {place.distance}</p>}
 
+              {place.reviews && place.reviews.length > 0 && (
+                <div className="mb-4 pt-3 border-t border-slate-200 dark:border-slate-700">
+                  <h3 className="text-md font-semibold text-slate-700 dark:text-slate-300 mb-2">Reviews:</h3>
+                  <ul className="space-y-2 text-sm text-slate-500 dark:text-slate-400 max-h-28 overflow-y-auto pr-2">
+                    {place.reviews.slice(0, 2).map((review, index) => (
+                      <li key={index} className="p-2 border border-slate-200 dark:border-slate-600 rounded-md text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 italic">"{review}"</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {(place.type || place.class) && (
+                <div className="pt-3 border-t border-red-200 dark:border-slate-700">
+                  <span className="text-sm bg-sky-100 dark:bg-sky-800/50 text-sky-700 dark:text-sky-300 px-3 py-1.5 rounded-full capitalize font-medium">
+                    {place.type}{place.type && place.class ? ` (${place.class})` : place.class || ''}
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+          {!loading && places.length === 0 && searchTerm && userLocation && !error && (
+            <p className="text-center text-slate-500 dark:text-slate-400 mt-8 p-6 bg-slate-100 dark:bg-slate-900/90 rounded-lg shadow-lg backdrop-blur-sm">
+              No places found for "{searchTerm}". Try a different search term or check for typos.
+            </p>
+          )}
         </div>
       </div>
     </div>

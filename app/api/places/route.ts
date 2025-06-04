@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
   try {
     const response = await axios.get<NominatimPlace[]>(nominatimUrl, {
       headers: {
-        'User-Agent': 'WeatherWiseJourneyApp/1.0 (your-email@example.com)', // IMPORTANT: Replace with your app's contact email
+        'User-Agent': 'WeatherWiseJourneyApp/1.0 (jeelrupareliya69@gmail.com)',
       },
     });
 
