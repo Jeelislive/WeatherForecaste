@@ -1,12 +1,5 @@
 # WeatherForecaste — AI‑Powered Journey & Weather Planner
 
-Plan smarter trips with live weather, AI itineraries, interactive maps, and a beautiful dashboard. Get hyper‑local forecasts, find places near you, and generate shareable trip PDFs — all in one place.
-
-• Live site: https://weather-forecaste-vpe7.vercel.app
-• Repository: https://github.com/Jeelislive/WeatherForecaste
-
----
-
 ## Features
 
 - **AI Journey Planner (Gemini 1.5 Flash)**
