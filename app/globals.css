@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+.scroll-smooth, html {
+  scroll-behavior: smooth;
+}
+
+/* Base colors for light/dark to avoid flash */
+@layer base {
+  body {
+    @apply bg-white text-gray-900;
+  }
+  .dark body {
+    @apply bg-gray-950 text-gray-100;
+  }
+}
+
 .geoapify-autocomplete-container {
   position: relative;
   width: 100%;
