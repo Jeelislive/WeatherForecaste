@@ -1,5 +1,8 @@
 # WeatherForecaste - AI‑Powered Journey & Weather Planner
 
+![Home Screenshot](https://res.cloudinary.com/dupv4u12a/image/upload/v1758952165/Screenshot_from_2025-09-27_11-17-41_icnvlk.png)
+![Dashboard Screenshot](https://res.cloudinary.com/dupv4u12a/image/upload/v1758952131/Screenshot_from_2025-09-27_11-18-16_hwagpl.png)
+
 ## Features
 
 - **AI Journey Planner (Gemini 1.5 Flash)**
