@@ -1,4 +1,4 @@
-# WeatherForecaste — AI‑Powered Journey & Weather Planner
+# WeatherForecaste - AI‑Powered Journey & Weather Planner
 
 ## Features
 
